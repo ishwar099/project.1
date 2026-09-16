@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Shkara Store</title>
+  <meta name="description" content="Shkara Store - a mobile-first e-commerce store featuring trending products and a Cash on Delivery checkout." />
+  <meta property="og:title" content="Shkara Store" />
+  <meta property="og:description" content="Shkara Store - a mobile-first e-commerce store featuring trending products and a Cash on Delivery checkout." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Plus Jakarta Sans for crisp modern typography & Playfair Display for luxury accents -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fafaf9',
+              100: '#f5f5f4',
+              200: '#e7e5e4',
+              300: '#d6d3d1',
+              400: '#a8a29e',
+              500: '#78716c',
+              600: '#57534e',
+              700: '#44403c',
+              800: '#292524',
+              900: '#1c1917',
+              950: '#0c0a09',
+            },
+            gold: {
+              500: '#d97706',
+              600: '#b45309',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
+    .modal-backdrop {
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-sheet {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease;
+    }
+    .modal-closed .modal-backdrop {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .modal-closed .modal-sheet {
+      transform: translateY(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    @media (min-width: 640px) {
+      .modal-closed .modal-sheet {
+        transform: translateY(20px) scale(0.96);
+      }
+    }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-900 font-sans antialiased min-h-screen flex flex-col selection:bg-stone-900 selection:text-white">
+
+  <!-- Top Announcement Bar -->
+  <aside id="announcement-bar" class="bg-stone-950 text-stone-300 text-xs py-2 px-4 text-center tracking-wider uppercase font-medium flex items-center justify-center gap-2 border-b border-stone-800">
+    <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span>Pay On Delivery Available Nationwide • 100% Doorstep Inspection</span>
+  </aside>
+
+  <!-- Sticky Navbar -->
+  <header id="main-header" class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200/80 transition-shadow">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#" id="brand-logo" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-lg bg-stone-900 text-white flex items-center justify-center font-serif text-lg font-bold shadow-sm transition-transform group-hover:scale-105">
+          S
+        </div>
+        <div class="flex flex-col">
+          <span class="font-serif tracking-widest text-lg font-bold text-stone-950 leading-none">SHKARA</span>
+          <span class="text-[9px] tracking-[0.25em] text-stone-500 uppercase font-semibold">Store</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-4">
+        <div class="hidden sm:flex items-center gap-1.5 text-xs text-stone-600 bg-stone-100 px-3 py-1 rounded-full border border-stone-200/60 font-medium">
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          <span>Cash on Delivery</span>
+        </div>
+
+        <button id="cart-button" aria-label="Shopping Cart" class="relative p-2.5 rounded-full text-stone-800 hover:bg-stone-100 active:scale-95 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+          </svg>
+          <span id="cart-badge" class="absolute top-1 right-1 w-4 h-4 bg-stone-950 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            4
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Value Proposition Banner -->
+  <section id="trust-hero" class="bg-gradient-to-b from-stone-100/70 to-stone-50 border-b border-stone-200/60 py-6 px-4">
+    <div class="max-w-6xl mx-auto flex flex-col items-center text-center">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold mb-2">
+        <svg class="w-3.5 h-3.5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+        Zero Upfront Payment • Pay In Cash At Door
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-serif font-bold text-stone-900 tracking-tight">
+        Shkara Store Essentials
+      </h1>
+      <p class="text-sm text-stone-600 mt-1 max-w-md">
+        Order in 30 seconds without a credit card. Inspect your parcel at delivery before paying.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 border-b border-stone-200 pb-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+          <p class="text-xs uppercase tracking-[0.2em] font-semibold text-stone-500">Curated For You</p>
+        </div>
+        <h2 id="trending-heading" class="text-2xl sm:text-3xl font-serif font-bold text-stone-950 tracking-tight mt-1">
+          Trending Products
+        </h2>
+      </div>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1 sm:mt-0 font-medium">
+        Limited stock • Free express COD shipping
+      </p>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+
+      <!-- Product Card 1 -->
+      <article id="product-card-1" class="group bg-white rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-stone-300 transition-all duration-300 flex flex-col overflow-hidden">
+        <div class="relative w-full aspect-square bg-stone-100 overflow-hidden">
+          <img
+            src="https://placehold.co/700x700/e7e5e4/57534e?text=Product+1"
+            alt="Product One"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            loading="eager"
+          />
+          <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-stone-900 text-white shadow-sm">
+              60% OFF
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-amber-100 text-amber-900 border border-amber-200/80">
+              COD Available
+            </span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-1.5">
+            <div class="flex text-amber-500 text-xs">★★★★★</div>
+            <span class="text-[11px] font-semibold text-stone-700">4.9</span>
+            <span class="text-[11px] text-stone-400 font-normal">(428 reviews)</span>
+          </div>
+          <h3 class="font-semibold text-stone-900 text-base leading-snug group-hover:text-stone-700 transition-colors">
+            Shkara Signature Item One
+          </h3>
+          <p class="text-xs text-stone-500 mt-1 line-clamp-1">Add your product description here</p>
+          <div class="mt-4 pt-3 border-t border-stone-100 flex items-baseline gap-2.5">
+            <span class="text-xl font-bold text-stone-950 font-sans tracking-tight">₹799</span>
+            <span class="text-sm text-stone-400 line-through font-medium">₹1999</span>
+            <span class="text-xs font-semibold text-emerald-700 ml-auto">Save ₹1200</span>
+          </div>
+          <button
+            type="button"
+            id="buy-btn-1"
+            data-title="Shkara Signature Item One"
+            data-price="₹799"
+            data-original="₹1999"
+            data-image="https://placehold.co/700x700/e7e5e4/57534e?text=Product+1"
+            class="buy-now-btn mt-4 w-full py-3 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-black text-white text-sm font-semibold tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99]"
+          >
+            <span>Buy Now</span>
+            <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- Product Card 2 -->
+      <article id="product-card-2" class="group bg-white rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-stone-300 transition-all duration-300 flex flex-col overflow-hidden">
+        <div class="relative w-full aspect-square bg-stone-100 overflow-hidden">
+          <img
+            src="https://placehold.co/700x700/e7e5e4/57534e?text=Product+2"
+            alt="Product Two"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            loading="lazy"
+          />
+          <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-stone-900 text-white shadow-sm">
+              55% OFF
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-amber-100 text-amber-900 border border-amber-200/80">
+              COD Available
+            </span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-1.5">
+            <div class="flex text-amber-500 text-xs">★★★★★</div>
+            <span class="text-[11px] font-semibold text-stone-700">4.8</span>
+            <span class="text-[11px] text-stone-400 font-normal">(312 reviews)</span>
+          </div>
+          <h3 class="font-semibold text-stone-900 text-base leading-snug group-hover:text-stone-700 transition-colors">
+            Shkara Signature Item Two
+          </h3>
+          <p class="text-xs text-stone-500 mt-1 line-clamp-1">Add your product description here</p>
+          <div class="mt-4 pt-3 border-t border-stone-100 flex items-baseline gap-2.5">
+            <span class="text-xl font-bold text-stone-950 font-sans tracking-tight">₹899</span>
+            <span class="text-sm text-stone-400 line-through font-medium">₹1998</span>
+            <span class="text-xs font-semibold text-emerald-700 ml-auto">Save ₹1099</span>
+          </div>
+          <button
+            type="button"
+            id="buy-btn-2"
+            data-title="Shkara Signature Item Two"
+            data-price="₹899"
+            data-original="₹1998"
+            data-image="https://placehold.co/700x700/e7e5e4/57534e?text=Product+2"
+            class="buy-now-btn mt-4 w-full py-3 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-black text-white text-sm font-semibold tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99]"
+          >
+            <span>Buy Now</span>
+            <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- Product Card 3 -->
+      <article id="product-card-3" class="group bg-white rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-stone-300 transition-all duration-300 flex flex-col overflow-hidden">
+        <div class="relative w-full aspect-square bg-stone-100 overflow-hidden">
+          <img
+            src="https://placehold.co/700x700/e7e5e4/57534e?text=Product+3"
+            alt="Product Three"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            loading="lazy"
+          />
+          <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-stone-900 text-white shadow-sm">
+              50% OFF
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-amber-100 text-amber-900 border border-amber-200/80">
+              COD Available
+            </span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-1.5">
+            <div class="flex text-amber-500 text-xs">★★★★★</div>
+            <span class="text-[11px] font-semibold text-stone-700">5.0</span>
+            <span class="text-[11px] text-stone-400 font-normal">(614 reviews)</span>
+          </div>
+          <h3 class="font-semibold text-stone-900 text-base leading-snug group-hover:text-stone-700 transition-colors">
+            Shkara Signature Item Three
+          </h3>
+          <p class="text-xs text-stone-500 mt-1 line-clamp-1">Add your product description here</p>
+          <div class="mt-4 pt-3 border-t border-stone-100 flex items-baseline gap-2.5">
+            <span class="text-xl font-bold text-stone-950 font-sans tracking-tight">₹649</span>
+            <span class="text-sm text-stone-400 line-through font-medium">₹1499</span>
+            <span class="text-xs font-semibold text-emerald-700 ml-auto">Save ₹850</span>
+          </div>
+          <button
+            type="button"
+            id="buy-btn-3"
+            data-title="Shkara Signature Item Three"
+            data-price="₹649"
+            data-original="₹1499"
+            data-image="https://placehold.co/700x700/e7e5e4/57534e?text=Product+3"
+            class="buy-now-btn mt-4 w-full py-3 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-black text-white text-sm font-semibold tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99]"
+          >
+            <span>Buy Now</span>
+            <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+      <!-- Product Card 4 -->
+      <article id="product-card-4" class="group bg-white rounded-2xl border border-stone-200/90 shadow-sm hover:shadow-md hover:border-stone-300 transition-all duration-300 flex flex-col overflow-hidden">
+        <div class="relative w-full aspect-square bg-stone-100 overflow-hidden">
+          <img
+            src="https://placehold.co/700x700/e7e5e4/57534e?text=Product+4"
+            alt="Product Four"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+            loading="lazy"
+          />
+          <div class="absolute top-3 left-3 flex flex-col gap-1.5">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-stone-900 text-white shadow-sm">
+              45% OFF
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-amber-100 text-amber-900 border border-amber-200/80">
+              COD Available
+            </span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-1.5">
+            <div class="flex text-amber-500 text-xs">★★★★★</div>
+            <span class="text-[11px] font-semibold text-stone-700">4.7</span>
+            <span class="text-[11px] text-stone-400 font-normal">(201 reviews)</span>
+          </div>
+          <h3 class="font-semibold text-stone-900 text-base leading-snug group-hover:text-stone-700 transition-colors">
+            Shkara Signature Item Four
+          </h3>
+          <p class="text-xs text-stone-500 mt-1 line-clamp-1">Add your product description here</p>
+          <div class="mt-4 pt-3 border-t border-stone-100 flex items-baseline gap-2.5">
+            <span class="text-xl font-bold text-stone-950 font-sans tracking-tight">₹549</span>
+            <span class="text-sm text-stone-400 line-through font-medium">₹999</span>
+            <span class="text-xs font-semibold text-emerald-700 ml-auto">Save ₹450</span>
+          </div>
+          <button
+            type="button"
+            id="buy-btn-4"
+            data-title="Shkara Signature Item Four"
+            data-price="₹549"
+            data-original="₹999"
+            data-image="https://placehold.co/700x700/e7e5e4/57534e?text=Product+4"
+            class="buy-now-btn mt-4 w-full py-3 px-4 rounded-xl bg-stone-900 hover:bg-stone-800 active:bg-black text-white text-sm font-semibold tracking-wide transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow active:scale-[0.99]"
+          >
+            <span>Buy Now</span>
+            <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </button>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Trust Strip -->
+    <section class="mt-10 sm:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="flex items-center gap-2.5 bg-white rounded-xl border border-stone-200/80 p-3.5">
+        <div class="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-stone-900">Doorstep Inspection</h4>
+          <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">Pay only after checking</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 bg-white rounded-xl border border-stone-200/80 p-3.5">
+        <div class="w-9 h-9 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 8v2"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-stone-900">No Advance Payment</h4>
+          <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">100% Cash on Delivery</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 bg-white rounded-xl border border-stone-200/80 p-3.5">
+        <div class="w-9 h-9 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4zm0 6l9 4 9-4M3 13v4l9 4 9-4v-4"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-stone-900">Easy Returns</h4>
+          <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">7-day replacement</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 bg-white rounded-xl border border-stone-200/80 p-3.5">
+        <div class="w-9 h-9 rounded-full bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-xs sm:text-sm font-bold text-stone-900">Dispatched in 24h</h4>
+          <p class="text-[11px] sm:text-xs text-stone-500 mt-0.5">Express tracking via courier SMS</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="main-footer" class="bg-white border-t border-stone-200 py-8 px-4 text-center mt-auto">
+    <div class="max-w-6xl mx-auto flex flex-col items-center justify-center gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded bg-stone-900 text-white flex items-center justify-center font-serif text-xs font-bold">S</div>
+        <span class="font-serif tracking-wider font-bold text-stone-900 text-sm">SHKARA STORE</span>
+      </div>
+      <p class="text-xs text-stone-500 max-w-sm">
+        All orders shipped with insured tamper-proof packaging. Pay comfortably on delivery.
+      </p>
+      <p class="text-[11px] text-stone-400 mt-2">
+        &copy; 2026 Shkara Store. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <!-- COD Checkout Modal -->
+  <div id="checkout-modal" class="modal-closed fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <div id="modal-backdrop" class="modal-backdrop fixed inset-0 bg-stone-950/70 backdrop-blur-sm"></div>
+
+    <div id="modal-container" class="modal-sheet relative w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border border-stone-200/80 max-h-[92vh] flex flex-col overflow-hidden z-10">
+
+      <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between bg-stone-50/70">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center border border-amber-200/60 font-bold">
+            💵
+          </div>
+          <div>
+            <h3 id="modal-title" class="font-serif text-lg font-bold text-stone-950 leading-tight">
+              Cash on Delivery Order
+            </h3>
+            <p class="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              No online payment required • Pay at door
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="close-modal-btn"
+          aria-label="Close checkout modal"
+          class="p-2 text-stone-400 hover:text-stone-700 rounded-full hover:bg-stone-200/60 transition-colors active:scale-95"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-5 py-3.5 bg-stone-100/70 border-b border-stone-200/60 flex items-center gap-3">
+        <img
+          id="modal-product-image"
+          src="https://placehold.co/300x300/e7e5e4/57534e?text=Product"
+          alt="Selected product"
+          class="w-12 h-12 rounded-lg object-cover border border-stone-200 shrink-0"
+        />
+        <div class="flex-grow min-w-0">
+          <p id="modal-product-title" class="text-xs sm:text-sm font-bold text-stone-900 truncate">
+            Shkara Signature Item One
+          </p>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span id="modal-product-price" class="text-xs sm:text-sm font-bold text-stone-950">₹799</span>
+            <span id="modal-product-original" class="text-xs text-stone-400 line-through">₹1999</span>
+            <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+              Free Express COD
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-5 overflow-y-auto max-h-[calc(92vh-180px)]">
+
+        <form id="cod-checkout-form" action="https://formspree.io/f/xqpazpdo" method="POST" class="space-y-4">
+
+          <input type="hidden" id="form-item-name" name="item_name" value="Shkara Signature Item One" />
+          <input type="hidden" id="form-item-price" name="item_price" value="₹799" />
+          <input type="hidden" name="payment_method" value="Cash on Delivery (COD)" />
+
+          <div>
+            <label for="customer-name" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              Full Name <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="customer-name"
+                name="name"
+                required
+                placeholder="e.g. Rohan Sharma"
+                class="w-full pl-10 pr-3.5 py-3 rounded-xl border border-stone-300 focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 text-stone-900 text-sm placeholder-stone-400 transition-all outline-none bg-stone-50/40 focus:bg-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="customer-phone" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              10-Digit Phone Number <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+              </div>
+              <input
+                type="tel"
+                id="customer-phone"
+                name="phone"
+                required
+                pattern="[0-9]{10}"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="10 digits (e.g. 9876543210)"
+                class="w-full pl-10 pr-3.5 py-3 rounded-xl border border-stone-300 focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 text-stone-900 text-sm placeholder-stone-400 transition-all outline-none bg-stone-50/40 focus:bg-white font-mono tracking-wide"
+              />
+            </div>
+            <p class="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
+              <svg class="w-3 h-3 text-stone-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Courier agent will call this number before arrival
+            </p>
+          </div>
+
+          <div>
+            <label for="customer-address" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+              Complete Delivery Address <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <textarea
+                id="customer-address"
+                name="address"
+                rows="3"
+                required
+                placeholder="House/Flat No., Building Name, Street, Landmark, City & Postal Code"
+                class="w-full p-3.5 rounded-xl border border-stone-300 focus:border-stone-900 focus:ring-2 focus:ring-stone-900/10 text-stone-900 text-sm placeholder-stone-400 transition-all outline-none bg-stone-50/40 focus:bg-white resize-none"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="bg-amber-50/90 border border-amber-200/80 rounded-xl p-3.5 flex items-start gap-2.5">
+            <div class="text-amber-700 text-base shrink-0 mt-0.5">🛡️</div>
+            <div class="text-xs text-amber-900 leading-relaxed">
+              <strong class="font-bold">Peace of Mind Guarantee:</strong>
+              You don't pay anything right now. Hand the exact cash to the courier only after checking the package.
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="confirm-cod-submit-btn"
+            class="w-full py-4 px-6 rounded-xl bg-stone-950 hover:bg-stone-800 active:bg-black text-white text-base font-bold tracking-wide transition-all shadow-lg hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Confirm COD Order</span>
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </button>
+        </form>
+
+        <div id="order-success-state" class="hidden text-center py-6">
+          <div class="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl mb-3 shadow-inner">
+            ✓
+          </div>
+          <h4 class="font-serif text-xl font-bold text-stone-900">Order Confirmed!</h4>
+          <p class="text-xs text-stone-600 mt-1 max-w-xs mx-auto">
+            Your Cash on Delivery parcel is being prepared for dispatch. Our courier partner will call you before delivery.
+          </p>
+          <div class="mt-4 p-3 bg-stone-50 rounded-xl text-xs text-stone-700 border border-stone-200">
+            Payment Mode: <strong class="text-stone-950">Cash on Delivery</strong>
+          </div>
+          <button
+            type="button"
+            id="continue-shopping-btn"
+            class="mt-5 w-full py-3 rounded-xl bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition-colors"
+          >
+            Continue Shopping
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    (function () {
+      'use strict';
+
+      const modal = document.getElementById('checkout-modal');
+      const modalBackdrop = document.getElementById('modal-backdrop');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const buyNowButtons = document.querySelectorAll('.buy-now-btn');
+
+      const modalProductImage = document.getElementById('modal-product-image');
+      const modalProductTitle = document.getElementById('modal-product-title');
+      const modalProductPrice = document.getElementById('modal-product-price');
+      const modalProductOriginal = document.getElementById('modal-product-original');
+
+      const formItemName = document.getElementById('form-item-name');
+      const formItemPrice = document.getElementById('form-item-price');
+
+      const form = document.getElementById('cod-checkout-form');
+      const phoneInput = document.getElementById('customer-phone');
+      const successState = document.getElementById('order-success-state');
+      const continueShoppingBtn = document.getElementById('continue-shopping-btn');
+
+      function openModal(btn) {
+        if (!modal) return;
+
+        const title = btn?.dataset.title || 'Shkara Store Item';
+        const price = btn?.dataset.price || '₹799';
+        const original = btn?.dataset.original || '₹1999';
+        const image = btn?.dataset.image || '';
+
+        if (modalProductTitle) modalProductTitle.textContent = title;
+        if (modalProductPrice) modalProductPrice.textContent = price;
+        if (modalProductOriginal) modalProductOriginal.textContent = original;
+        if (modalProductImage && image) modalProductImage.src = image;
+
+        if (formItemName) formItemName.value = title;
+        if (formItemPrice) formItemPrice.value = price;
+
+        if (form) form.classList.remove('hidden');
+        if (successState) successState.classList.add('hidden');
+
+        modal.classList.remove('modal-closed');
+        document.body.style.overflow = 'hidden';
+
+        setTimeout(function () {
+          const nameInput = document.getElementById('customer-name');
+          if (nameInput) nameInput.focus();
+        }, 300);
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.add('modal-closed');
+        document.body.style.overflow = '';
+      }
+
+      buyNowButtons.forEach(function (button) {
+        button.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openModal(button);
+        });
+      });
+
+      if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+      if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
+      if (continueShoppingBtn) continueShoppingBtn.addEventListener('click', closeModal);
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('modal-closed')) {
+          closeModal();
+        }
+      });
+
+      if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+          this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+        });
+      }
+
+      const submitBtn = document.getElementById('confirm-cod-submit-btn');
+
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          const action = form.getAttribute('action');
+          const originalBtnHTML = submitBtn ? submitBtn.innerHTML : '';
+
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Placing your order...</span>';
+          }
+
+          fetch(action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          })
+            .then(function (response) {
+              if (response.ok) {
+                form.classList.add('hidden');
+                if (successState) successState.classList.remove('hidden');
+              } else {
+                response.json().then(function (data) {
+                  const msg = (data && data.errors) ? data.errors.map(function (er) { return er.message; }).join(', ') : 'Something went wrong. Please try again.';
+                  alert(msg);
+                }).catch(function () {
+                  alert('Something went wrong. Please try again.');
+                });
+              }
+            })
+            .catch(function () {
+              alert('Network error. Please check your connection and try again.');
+            })
+            .finally(function () {
+              if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHTML;
+              }
+            });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
